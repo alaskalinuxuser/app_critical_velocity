@@ -25,18 +25,20 @@ public class criticalvelocity extends ApplicationAdapter {
 	SpriteBatch batch;
     //ShapeRenderer shapeRenderer; // For visualizing collision shapes.
 	Texture background, winBG;
-	Texture[] vehicles, dialogs;
+	Texture[] vehicles, dialogs, powerups, criticalship, distortship;
 	Texture topBar, bottomBar;
-	int blinkState, gameState, gapSize, maxOffset, numBarriers, spacing, thrust, playerScore;
+	int blinkState, gameState, gapSize, maxOffset, numBarriers, numSpecials, spacing, thrust,
+            playerScore, timerDist, waitTime;
 	float vehicleY, vehicleX, gravityDown, vehicleSpeed, increaseSpeed, winX;
-    float[] bothX, bottomY, topY;
-    int[] eachOffset;
+    float[] bothX, bottomY, topY, specY, specX;
+    int[] eachOffset, setSpec;
     long id;
+    Boolean criticalVelocity, spacialDistortion, waitBoolean;
     Random randomNumber;
-    Circle shipCircle, frontCircle, rearCircle;
+    Circle shipCircle, frontCircle, rearCircle, powerCircle;
     Rectangle barrierRectangleTop, barrierRectangleBottom;
     BitmapFont font;
-    Sound sound;
+    Sound sound, soundOne;
     Music bgMusic;
 
     private Viewport viewport;
@@ -54,11 +56,13 @@ public class criticalvelocity extends ApplicationAdapter {
         Audio audio = Gdx.audio;
         bgMusic = Gdx.audio.newMusic(Gdx.files.internal("spblk.mp3"));
         sound = Gdx.audio.newSound(Gdx.files.internal("crash.mp3"));
+        soundOne = Gdx.audio.newSound(Gdx.files.internal("coin.mp3"));
 
         //shapeRenderer = new ShapeRenderer(); // For visualizing collision shapes.
         shipCircle = new Circle();
         frontCircle = new Circle();
         rearCircle = new Circle();
+        powerCircle = new Circle();
         barrierRectangleTop = new Rectangle();
         barrierRectangleBottom = new Rectangle();
 
@@ -73,19 +77,43 @@ public class criticalvelocity extends ApplicationAdapter {
 		topBar = new Texture("topbarrier.png");
 		bottomBar = new Texture("bottombarrier.png");
 
-		vehicles = new Texture[7];
-		vehicles[0] = new Texture("vehicle.png");
-		vehicles[1] = new Texture("vehicletwo.png");
-		vehicles[2] = new Texture("vehiclethree.png");
-		vehicles[3] = new Texture("vehiclefour.png");
-		vehicles[4] = new Texture("vehiclefive.png");
+        vehicles = new Texture[7];
+        vehicles[0] = new Texture("vehicle.png");
+        vehicles[1] = new Texture("vehicletwo.png");
+        vehicles[2] = new Texture("vehiclethree.png");
+        vehicles[3] = new Texture("vehiclefour.png");
+        vehicles[4] = new Texture("vehiclefive.png");
         vehicles[5] = new Texture("vehiclesix.png");
         vehicles[6] = new Texture("vehicleexplode.png");
 
-        dialogs = new Texture[3];
+        powerups = new Texture[3];
+        powerups[0] = new Texture("powerupbonus.png");
+        powerups[1] = new Texture("powerupdistort.png");
+        powerups[2] = new Texture("powerupslow.png");
+
+        criticalship = new Texture[7];
+        criticalship[0] = new Texture("superone.png");
+        criticalship[1] = new Texture("supertwo.png");
+        criticalship[2] = new Texture("superthree.png");
+        criticalship[3] = new Texture("superfour.png");
+        criticalship[4] = new Texture("superfive.png");
+        criticalship[5] = new Texture("supersix.png");
+        criticalship[6] = new Texture("vehicleexplode.png");
+
+        distortship = new Texture[7];
+        distortship[0] = new Texture("distone.png");
+        distortship[1] = new Texture("disttwo.png");
+        distortship[2] = new Texture("distthree.png");
+        distortship[3] = new Texture("distfour.png");
+        distortship[4] = new Texture("distfive.png");
+        distortship[5] = new Texture("distsix.png");
+        distortship[6] = new Texture("vehicleexplode.png");
+
+        dialogs = new Texture[4];
         dialogs[0] = new Texture("dialogbegin.png");
         dialogs[1] = new Texture("gameoverBox.png");
         dialogs[2] = new Texture("gamewinBox.png");
+        dialogs[3] = new Texture("dialogspecial.png");
 
 
         // Game variables....
@@ -95,12 +123,16 @@ public class criticalvelocity extends ApplicationAdapter {
         increaseSpeed = .1f;
         thrust = -25;
         numBarriers = 4;
+        numSpecials = 1;
 
         // My arrays....
         eachOffset = new int[numBarriers];
+        setSpec = new int[numSpecials];
         bothX = new float[numBarriers];
         topY = new float[numBarriers];
         bottomY = new float[numBarriers];
+        specY = new float[numSpecials];
+        specX = new float[numSpecials];
 
         // Random number generator.
         randomNumber = new Random();
@@ -128,6 +160,12 @@ public class criticalvelocity extends ApplicationAdapter {
         gameState = 0;
         vehicleSpeed = 5;
         winX = 0;
+        criticalVelocity = false;
+        spacialDistortion = false;
+        waitTime = 60;
+
+        // Testing only //
+        //timerDist = 2500;
 
         // For loop to build the barriers.
         for (int z = 0; z < numBarriers; z++) {
@@ -135,6 +173,19 @@ public class criticalvelocity extends ApplicationAdapter {
             bottomY[z] = Gdx.graphics.getHeight()/2 - bottomBar.getHeight() - randomNumber.nextInt(maxOffset);
             topY[z] = bottomY[z] + bottomBar.getHeight() + gapSize;
             bothX[z] = Gdx.graphics.getWidth()/2 + Gdx.graphics.getWidth() + (z * spacing);
+
+        }
+
+        // For loop to build the specials.
+        for (int s = 0; s < numSpecials; s++) {
+
+            // Place the special.
+            specX[s] = Gdx.graphics.getWidth()/(randomNumber.nextInt(10)+1);
+            specY[s] = (randomNumber.nextInt(Gdx.graphics.getHeight())+1);
+
+            // Give it a type.
+            setSpec[s] = randomNumber.nextInt(3);
+            // Testing only // Gdx.app.log("setSpec WJH", String.valueOf(setSpec[s]));
 
         }
 
@@ -164,6 +215,7 @@ public class criticalvelocity extends ApplicationAdapter {
 		 * 2 = crashed or game over.
 		 * 3 = winning
 		 * 4 = game over with win condition.
+		 * 5 = define special abilities.
 		 */
 
 		if (gameState == 1) {
@@ -215,6 +267,19 @@ public class criticalvelocity extends ApplicationAdapter {
                     // And increase the speed.
                     vehicleSpeed = vehicleSpeed + increaseSpeed;
 
+                    // And determine Critical Velocity!
+                    if (vehicleSpeed >= 15) {
+
+                        criticalVelocity = true;
+
+                    } else {
+
+                        // We maintain this else, in case a slow down power up is used, bringing us
+                        // under the threshold of critical velocity....
+                        criticalVelocity = false;
+
+                    }
+
                 } else {
 
                     // Since they are on the screen, let's move them.
@@ -228,7 +293,17 @@ public class criticalvelocity extends ApplicationAdapter {
                     if (bothX[x] < vehicleX - topBar.getWidth()) {
 
                         // Because the user made it past that, let's give them a score bonus!
-                        playerScore = playerScore + 1;
+
+                        if (criticalVelocity){
+
+                            // critical velocity, then a three point bonus.
+                            playerScore = playerScore + 3;
+
+                        } else {
+
+                            // Not critical velocity, then just a one point bonus.
+                            playerScore = playerScore + 1;
+                        }
 
                     } // scoring barriers.
                 }
@@ -239,6 +314,60 @@ public class criticalvelocity extends ApplicationAdapter {
 
 
             } // Moving barriers.
+
+            // Draw the special.
+            for (int p = 0; p < numSpecials; p++) {
+
+                // If the special went off of the screen, move it back to the beginning.
+                if (specX[p] < 0 - powerups[0].getWidth()) {
+
+                    // Place the special.
+                    specX[p] = Gdx.graphics.getWidth() * (randomNumber.nextInt(10)+1);
+                    specY[p] = (randomNumber.nextInt(Gdx.graphics.getHeight())+1);;
+
+                    // Give it a type.
+                    setSpec[p] = randomNumber.nextInt(3);
+
+                } // if special is off the screen, move it.
+                else {
+
+                    specX[p] = specX[p] - vehicleSpeed - increaseSpeed;
+                } //else just move it.
+
+                // Either way, let's draw it.
+                batch.draw(powerups[setSpec[p]], specX[p], specY[p]);
+                powerCircle.set(specX[p] + powerups[p].getHeight()/2,
+                        specY[p] + powerups[p].getWidth()/2, powerups[p].getWidth());
+
+                if (Intersector.overlaps(frontCircle, powerCircle) ||
+                        Intersector.overlaps(rearCircle, powerCircle) ||
+                        Intersector.overlaps(shipCircle, powerCircle)) {
+
+                    // Play the coin sound!
+                    id = soundOne.play();
+
+                    if (setSpec[p] == 2) {
+
+                        //Slow down by 25%
+                        vehicleSpeed = vehicleSpeed * 3 / 4;
+
+                    } else if (setSpec[p] == 1) {
+
+                        //distortion, enter distortion mode.
+                        timerDist = 2500;
+                        spacialDistortion = true;
+
+                    } else {
+
+                        // Bonus
+                        playerScore = playerScore + 2500;
+                    }
+
+                    specX[p] = -50;
+
+                } // colided with power up.
+
+            } // moving the special powerups.
 
             for (int z = 0; z < numBarriers; z++) {
 
@@ -252,20 +381,37 @@ public class criticalvelocity extends ApplicationAdapter {
                 //shapeRenderer.rect(barrierRectangleBottom.x, barrierRectangleBottom.y, // For visualizing collision shapes.
                 //barrierRectangleBottom.getWidth(), barrierRectangleBottom.getHeight()); // For visualizing collision shapes.
 
-                if (Intersector.overlaps(frontCircle, barrierRectangleBottom) ||
-                        Intersector.overlaps(frontCircle, barrierRectangleTop) ||
-                        Intersector.overlaps(rearCircle, barrierRectangleBottom) ||
-                        Intersector.overlaps(rearCircle, barrierRectangleTop) ||
-                        Intersector.overlaps(shipCircle, barrierRectangleBottom) ||
-                        Intersector.overlaps(shipCircle, barrierRectangleTop)) {
+                if (spacialDistortion) {
 
-                    // Play the crash sound!
-                    id = sound.play();
+                    // Don't crash! But lower the timer.
+                    timerDist--;
 
-                    // Then we crashed!
-                    gameState = 2;
+                    // Display our score.
+                    font.draw(batch, String.valueOf(timerDist), 100, 100);
 
-                } // If we collided.
+                    // If our countdown timer reaches 0, turn off spacial distortion.
+                    if (timerDist <= 0) {
+
+                        spacialDistortion = false;
+
+                    }
+
+                } else {
+                    if (Intersector.overlaps(frontCircle, barrierRectangleBottom) ||
+                            Intersector.overlaps(frontCircle, barrierRectangleTop) ||
+                            Intersector.overlaps(rearCircle, barrierRectangleBottom) ||
+                            Intersector.overlaps(rearCircle, barrierRectangleTop) ||
+                            Intersector.overlaps(shipCircle, barrierRectangleBottom) ||
+                            Intersector.overlaps(shipCircle, barrierRectangleTop)) {
+
+                        // Play the crash sound!
+                        id = sound.play();
+
+                        // Then we crashed!
+                        gameState = 2;
+
+                    } // If we collided.
+                }
 
             } // Collision shapes for barriers.
 
@@ -281,7 +427,7 @@ public class criticalvelocity extends ApplicationAdapter {
 
 		} // Gamestate is 1, or in play.
 
-        else if (gameState == 2) {
+        if (gameState == 2) {
 
             // Let's log it! Testing only! // Gdx.app.log("WJH", "Game over!");
             blinkState = 6;
@@ -301,7 +447,7 @@ public class criticalvelocity extends ApplicationAdapter {
 
         } // gamestate is 2, or a crash condition!
 
-        else if (gameState == 3) {
+        if (gameState == 3) {
 
             // We are now in play.
             // Determin our blink state for our ship.
@@ -367,9 +513,9 @@ public class criticalvelocity extends ApplicationAdapter {
 
             batch.draw(winBG, winX, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        } // Gamestate is 3, or victory conditions.
+        } // Gamestate is 3, or victory conditions. //
 
-        else if (gameState == 4) {
+        if (gameState == 4) {
 
             batch.draw(winBG, winX, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -382,10 +528,25 @@ public class criticalvelocity extends ApplicationAdapter {
 
             }
 
-        }
+        } // Game state 4 //
 
-        // Draw the vehicle.
-		batch.draw(vehicles[blinkState], vehicleX , vehicleY);
+        // Draw the vehicle, depending on state.
+        if (criticalVelocity) {
+
+            // Critical velocity
+            batch.draw(criticalship[blinkState], vehicleX, vehicleY);
+
+        } else if (spacialDistortion) {
+
+            // Spacial Distortion
+            batch.draw(distortship[blinkState], vehicleX, vehicleY);
+
+        } else {
+
+            // Regular vehicle.
+            batch.draw(vehicles[blinkState], vehicleX, vehicleY);
+
+        }
 
         if (gameState == 0) {
 
@@ -406,11 +567,46 @@ public class criticalvelocity extends ApplicationAdapter {
 
             if (Gdx.input.justTouched()) {
 
-                gameState = 1;
+                waitBoolean = true;
+                gameState = 5;
 
             }
 
         } // gamestate is 0, or not started yet.
+
+        if (gameState == 5) {
+
+            // Determin our blink state for our ship.
+            if (blinkState <= 4) {
+
+                blinkState++;
+
+            } else {
+
+                blinkState = 0;
+
+            }
+
+            // Draw the screen.
+            batch.draw(dialogs[3], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
+
+            waitTime--;
+            if (waitTime <= 0) {
+
+                waitBoolean = false;
+
+            }
+
+            if (!waitBoolean) {
+
+                if (Gdx.input.justTouched()) {
+
+                gameState = 1;
+
+                }
+            }
+
+        } // gamestate is 5, or Paused.
 
         // Display our score.
         font.draw(batch, String.valueOf(playerScore), 100, Gdx.graphics.getHeight() - 100);
@@ -447,5 +643,6 @@ public class criticalvelocity extends ApplicationAdapter {
 		background.dispose();
         bgMusic.dispose();
         sound.dispose();
+        soundOne.dispose();
 	}
 }
