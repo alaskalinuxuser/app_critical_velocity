@@ -363,7 +363,7 @@ public class criticalvelocity extends ApplicationAdapter {
                         playerScore = playerScore + 2500;
                     }
 
-                    specX[p] = -50;
+                    specX[p] = -500;
 
                 } // colided with power up.
 
