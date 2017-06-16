@@ -15,6 +15,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -47,8 +50,17 @@ public class criticalvelocity extends ApplicationAdapter {
 	@Override
 	public void create () {
 
+        // Testing Only // Gdx.app.log("WJHscreen", String.valueOf(Gdx.graphics.getHeight()) +"x"+ String.valueOf(Gdx.graphics.getWidth()));
         camera = new PerspectiveCamera();
-        viewport = new StretchViewport(480, 800, camera);
+        if (Gdx.graphics.getHeight() <= 800 || Gdx.graphics.getWidth() <= 480) {
+
+            viewport = new ScreenViewport(camera);
+
+        } else {
+
+            viewport = new StretchViewport(480, 800, camera);
+
+        }
         viewport.apply();
         camera.position.set(camera.viewportWidth/2,camera.viewportHeight/2,0);
 
@@ -72,6 +84,17 @@ public class criticalvelocity extends ApplicationAdapter {
         font.getData().scale(5f);
 
 		batch = new SpriteBatch();
+
+        if (Gdx.graphics.getHeight() <= 800 || Gdx.graphics.getWidth() <= 480) {
+
+            background = new Texture("bgblsm.png");
+
+        } else {
+
+            background = new Texture("bgblue.png");
+
+        }
+
 		background = new Texture("bgblue.png");
         winBG = new Texture("bggreen.png");
 		topBar = new Texture("topbarrier.png");
@@ -199,7 +222,7 @@ public class criticalvelocity extends ApplicationAdapter {
 	public void render () {
 
         // Set up to render a red screen.
-        Gdx.gl.glClearColor(1, 0, 0, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // Begin the batch of textures.
