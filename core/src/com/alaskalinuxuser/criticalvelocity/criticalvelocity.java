@@ -50,6 +50,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
     private StringProvider stringprovider;
 
 	public criticalvelocity(StringProvider stringprovider) {
+		super();
 		this.stringprovider = stringprovider;
 	}
 
