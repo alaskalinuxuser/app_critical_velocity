@@ -150,7 +150,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
         gapSize = 450;
         maxOffset = (Gdx.graphics.getHeight()/2 - gapSize);
         spacing = (Gdx.graphics.getWidth()*2/3) + (gapSize/2);
-        increaseSpeed = .1f;
+        increaseSpeed = .125f;
         thrust = -25;
         numBarriers = 4;
         numSpecials = 1;
@@ -282,6 +282,8 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
                 // Play the crash sound!
                 id = sound.play();
 
+                waitBoolean = true;
+                waitTime = 60;
                 gameState = 2;
             } // we fell off the screen.
 
@@ -297,8 +299,10 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
                     // And increase the speed.
                     vehicleSpeed = vehicleSpeed + increaseSpeed;
 
+                    Gdx.app.log("WJH", String.valueOf(vehicleSpeed));
+
                     // And determine Critical Velocity!
-                    if (vehicleSpeed >= 15) {
+                    if (vehicleSpeed >= 12) {
 
                         criticalVelocity = true;
 
@@ -438,6 +442,8 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
                         id = sound.play();
 
                         // Then we crashed!
+                        waitBoolean = true;
+                        waitTime = 60;
                         gameState = 2;
 
                     } // If we collided.
@@ -465,14 +471,20 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
             // Draw the screen.
             batch.draw(dialogs[1], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
 
+            waitTime--;
+            if (waitTime <= 0) {
 
+                waitBoolean = false;
 
-            // What to do when we touch the screen.
-            if (Gdx.input.justTouched()) {
+            }
 
-                // Restart the game....
-                restartGame();
+            if (!waitBoolean) {
 
+                if (Gdx.input.justTouched()) {
+
+                    restartGame();
+
+                }
             } // Touching the screen.
 
         } // gamestate is 2, or a crash condition!
@@ -480,7 +492,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
         if (gameState == 3) {
 
             // We are now in play.
-            // Determin our blink state for our ship.
+            // Determine our blink state for our ship.
             if (blinkState <= 4) {
 
                 blinkState++;
@@ -513,6 +525,8 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
                 // Play the crash sound!
                 id = sound.play();
 
+                waitBoolean = true;
+                waitTime = 60;
                 gameState = 2;
             } // we fell off the screen.
 
@@ -537,6 +551,8 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
             } // if not won yet.
             else {
 
+                waitBoolean = true;
+                waitTime = 60;
                 gameState = 4;
 
             }
@@ -552,10 +568,20 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
             // Draw the screen.
             batch.draw(dialogs[2], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
 
-            if (Gdx.input.justTouched()) {
+            waitTime--;
+            if (waitTime <= 0) {
 
-                restartGame();
+                waitBoolean = false;
 
+            }
+
+            if (!waitBoolean) {
+
+                if (Gdx.input.justTouched()) {
+
+                    restartGame();
+
+                }
             }
 
         } // Game state 4 //
