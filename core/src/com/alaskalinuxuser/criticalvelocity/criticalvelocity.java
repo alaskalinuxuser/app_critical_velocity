@@ -174,8 +174,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
         restartGame();
 
         FileHandle baseFileHandle = Gdx.files.internal("MyStrings");
-        Locale locale = new Locale("en_us");
-        myStrings = I18NBundle.createBundle(baseFileHandle, locale);
+        myStrings = I18NBundle.createBundle(baseFileHandle);
 
         testString = myStrings.get("intro");
 
