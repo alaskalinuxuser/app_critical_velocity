@@ -6,6 +6,7 @@ import com.badlogic.gdx.Audio;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -16,12 +17,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.I18NBundle;
+import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.util.Locale;
 import java.util.Random;
 
 public class criticalvelocity extends ApplicationAdapter implements ApplicationListener {
@@ -41,18 +46,14 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
     Random randomNumber;
     Circle shipCircle, frontCircle, rearCircle, powerCircle;
     Rectangle barrierRectangleTop, barrierRectangleBottom;
-    BitmapFont font;
+    BitmapFont font, fontgreen, fontred;
     Sound sound, soundOne;
     Music bgMusic;
+    I18NBundle myStrings;
+    String testString;
 
     private Viewport viewport;
     private Camera camera;
-    private StringProvider stringprovider;
-
-	public criticalvelocity(StringProvider stringprovider) {
-		super();
-		this.stringprovider = stringprovider;
-	}
 
 	@Override
 	public void create () {
@@ -85,10 +86,16 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
         barrierRectangleTop = new Rectangle();
         barrierRectangleBottom = new Rectangle();
 
-        // Add our font.
+        // Add our fonts.
         font = new BitmapFont();
-        // Set our scale.
         font.getData().scale(5f);
+        font.setColor(1, 1, 1, 1);
+        fontgreen = new BitmapFont();
+        fontgreen.getData().scale(1.8f);
+        fontgreen.setColor(0, 1, 0, 1);
+        fontred = new BitmapFont();
+        fontred.getData().scale(1.8f);
+        fontred.setColor(1, 0, 0, 1);
 
 		batch = new SpriteBatch();
 
@@ -140,10 +147,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
         distortship[6] = new Texture("vehicleexplode.png");
 
         dialogs = new Texture[4];
-        dialogs[0] = new Texture("dialogbegin.png");
-        dialogs[1] = new Texture("gameoverBox.png");
-        dialogs[2] = new Texture("gamewinBox.png");
-        dialogs[3] = new Texture("dialogspecial.png");
+        dialogs[0] = new Texture("dialogempty.png");
 
 
         // Game variables....
@@ -168,6 +172,12 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
         randomNumber = new Random();
 
         restartGame();
+
+        FileHandle baseFileHandle = Gdx.files.internal("MyStrings");
+        Locale locale = new Locale("en_us");
+        myStrings = I18NBundle.createBundle(baseFileHandle, locale);
+
+        testString = myStrings.get("intro");
 
 	}// On create.
 
@@ -469,7 +479,9 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
             blinkState = 6;
 
             // Draw the screen.
-            batch.draw(dialogs[1], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
+            batch.draw(dialogs[0], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
+
+            fontred.draw(batch, myStrings.get("gamelose"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) + 100, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - 100);
 
             waitTime--;
             if (waitTime <= 0) {
@@ -566,7 +578,9 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
             batch.draw(winBG, winX, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
             // Draw the screen.
-            batch.draw(dialogs[2], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
+            batch.draw(dialogs[0], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
+
+            fontgreen.draw(batch, myStrings.get("gamewin"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) + 100, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - 100);
 
             waitTime--;
             if (waitTime <= 0) {
@@ -620,6 +634,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
             // Draw the screen.
             batch.draw(dialogs[0], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
 
+            fontgreen.draw(batch, myStrings.get("intro"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) + 100, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - 100);
 
             if (Gdx.input.justTouched()) {
 
@@ -644,7 +659,9 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
             }
 
             // Draw the screen.
-            batch.draw(dialogs[3], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
+            batch.draw(dialogs[0], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
+
+            fontgreen.draw(batch, myStrings.get("specialdef"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) + 100, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - 100);
 
             waitTime--;
             if (waitTime <= 0) {
@@ -666,6 +683,8 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
 
         // Display our score.
         font.draw(batch, String.valueOf(playerScore), 100, Gdx.graphics.getHeight() - 100);
+
+
 
 		batch.end();
 

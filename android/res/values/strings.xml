@@ -2,48 +2,5 @@
 <resources>
 
 	<string name="app_name">Critical Velocity</string>
-	
-	<!-- The beginning -->
-	<string name="intro">Captain! The planet is collapsing! We\'ve been hit!
-Power is failing and the thrusters are dying!
-We need to get out of this tunnel fast!
-\n\> Tap the screen to use the thrusters.
-\n\> Don\'t collide with any objects or the edges of the screen.
-\n\> As you travel you will pick up speed.
-\n\> There is a way out! Can you make it?
-</string>
-	<string name="tapToBegin">Tap to begin!</string>
-	
-	<!-- Game win screen-->
-	<string name="gamewinTitle">Congratulations! You made it Captain!</string>
-	
-	<!-- Game over screen-->
-	<string name="gameoverTitle">Game Over!</string>
-	
-	<string name="tapToPlay">Tap the screen to play again!</string>
-	
-	<!-- Specials and powerups -->
-	<string name="specials">Specials and powerups</string>
-	<string-array name="powerups">
-		<item>Bonus: Get 2500 point bonus! (Which gets you home faster!)</item>
-		<item>Special distortion:</item>
-		<item>Slow:</item>
-		<item>Critical velocity:</item>
-	</string-array>
-	<string name="tapToContinue">Tap the screen to continue!</string>
-	
-	<!-- Credits -->
-	<string name="creditsTitle">Credits:</string>
-	<string-array name="credits">
-		<item>This open source game is created by AlaskaLinuxUser:</item>
-		<item>Background image was created by The Quiet Learner:</item>
-		<item>Graphics were originally created by Daniel Cook and were modified:</item>
-		<item>Background music was created by Soulbringer, titled \"Space Blockbuster\"</item>
-	</string-array>
-	<string-array name="links">
-		<item>https://thealaskalinuxuser.wordpress.com</item>
-		<item>https://qlfiles.net</item>
-		<item>http://www.lostgarden.com/2005/03/game-post-mortem-hard-vacuum.html</item>
-		<item>http://freemusicarchive.org/music/Soulbringer/Soulbringer/Soulbringer_-_Space_Blockbuster</item>
-	</string-array>
+
 </resources>
