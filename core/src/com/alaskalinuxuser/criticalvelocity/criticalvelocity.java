@@ -17,16 +17,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Array;
+//import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
-import com.badlogic.gdx.utils.XmlReader;
-import com.badlogic.gdx.utils.viewport.FillViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+//import com.badlogic.gdx.utils.XmlReader;
+//import com.badlogic.gdx.utils.viewport.FillViewport;
+//import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import java.util.Locale;
 import java.util.Random;
 
 public class criticalvelocity extends ApplicationAdapter implements ApplicationListener {
@@ -101,11 +100,32 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
 
         if (Gdx.graphics.getHeight() <= 800 || Gdx.graphics.getWidth() <= 480) {
 
+            Gdx.app.log("WJH", String.valueOf(Gdx.graphics.getHeight()));
+
             background = new Texture("bgblsm.png");
+
+            if (Gdx.graphics.getHeight() > 320 || Gdx.graphics.getWidth() > 240) {
+
+                gapSize = 320;
+                thrust = -20;
+
+            } else {
+
+                gapSize = 150;
+                thrust = -15;
+
+            }
+
+            maxOffset = (Gdx.graphics.getHeight()/2 - gapSize/2);
+            spacing = (Gdx.graphics.getWidth()*2/3) + (gapSize);
 
         } else {
 
             background = new Texture("bgblue.png");
+            gapSize = 450;
+            thrust = -25;
+            maxOffset = (Gdx.graphics.getHeight()/2 - gapSize);
+            spacing = (Gdx.graphics.getWidth()*2/3) + (gapSize/2);
 
         }
 
@@ -151,11 +171,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
 
 
         // Game variables....
-        gapSize = 450;
-        maxOffset = (Gdx.graphics.getHeight()/2 - gapSize);
-        spacing = (Gdx.graphics.getWidth()*2/3) + (gapSize/2);
         increaseSpeed = .125f;
-        thrust = -25;
         numBarriers = 4;
         numSpecials = 1;
 
