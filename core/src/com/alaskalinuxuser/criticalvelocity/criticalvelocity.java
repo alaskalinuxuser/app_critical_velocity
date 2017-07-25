@@ -98,7 +98,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
 
 		batch = new SpriteBatch();
 
-        if (Gdx.graphics.getHeight() <= 800 || Gdx.graphics.getWidth() <= 480) {
+        if (Gdx.graphics.getHeight() <= 901 || Gdx.graphics.getWidth() <= 481) {
 
             Gdx.app.log("WJH", String.valueOf(Gdx.graphics.getHeight()));
 
