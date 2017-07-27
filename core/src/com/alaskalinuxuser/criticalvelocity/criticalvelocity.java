@@ -36,7 +36,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
 	Texture[] vehicles, dialogs, powerups, criticalship, distortship;
 	Texture topBar, bottomBar;
 	int blinkState, gameState, gapSize, maxOffset, numBarriers, numSpecials, spacing, thrust,
-            playerScore, timerDist, waitTime;
+            playerScore, timerDist, waitTime, textOffset;
 	float vehicleY, vehicleX, gravityDown, vehicleSpeed, increaseSpeed, winX;
     float[] bothX, bottomY, topY, specY, specX;
     int[] eachOffset, setSpec;
@@ -87,16 +87,16 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
 
         // Add our fonts.
         font = new BitmapFont();
-        font.getData().scale(5f);
         font.setColor(1, 1, 1, 1);
         fontgreen = new BitmapFont();
-        fontgreen.getData().scale(1.8f);
+
         fontgreen.setColor(0, 1, 0, 1);
         fontred = new BitmapFont();
-        fontred.getData().scale(1.8f);
         fontred.setColor(1, 0, 0, 1);
 
 		batch = new SpriteBatch();
+
+        dialogs = new Texture[1];
 
         if (Gdx.graphics.getHeight() <= 901 || Gdx.graphics.getWidth() <= 481) {
 
@@ -104,70 +104,120 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
 
             background = new Texture("bgblsm.png");
 
+
+
             if (Gdx.graphics.getHeight() > 320 || Gdx.graphics.getWidth() > 240) {
 
-                gapSize = 320;
+                gapSize = 225;
                 thrust = -20;
+                fontgreen.getData().scale(0.1f);
+                fontred.getData().scale(0.1f);
+                font.getData().scale(.5f);
+                textOffset = 25;
+                dialogs[0] = new Texture("dialogemptymed.png");
 
             } else {
 
-                gapSize = 150;
+                gapSize = 160;
                 thrust = -15;
+                fontgreen.getData().scale(0.008f);
+                fontred.getData().scale(0.008f);
+                font.getData().scale(.05f);
+                textOffset = 5;
+                dialogs[0] = new Texture("dialogemptysmall.png");
 
             }
 
+            topBar = new Texture("smtopbarrier.png");
+            bottomBar = new Texture("smbottombarrier.png");
+
+            vehicles = new Texture[7];
+            vehicles[0] = new Texture("smvehicle.png");
+            vehicles[1] = new Texture("smvehicletwo.png");
+            vehicles[2] = new Texture("smvehiclethree.png");
+            vehicles[3] = new Texture("smvehiclefour.png");
+            vehicles[4] = new Texture("smvehiclefive.png");
+            vehicles[5] = new Texture("smvehiclesix.png");
+            vehicles[6] = new Texture("smvehicleexplode.png");
+
+            powerups = new Texture[3];
+            powerups[0] = new Texture("smpowerupbonus.png");
+            powerups[1] = new Texture("smpowerupdistort.png");
+            powerups[2] = new Texture("smpowerupslow.png");
+
+            criticalship = new Texture[7];
+            criticalship[0] = new Texture("smsuperone.png");
+            criticalship[1] = new Texture("smsupertwo.png");
+            criticalship[2] = new Texture("smsuperthree.png");
+            criticalship[3] = new Texture("smsuperfour.png");
+            criticalship[4] = new Texture("smsuperfive.png");
+            criticalship[5] = new Texture("smsupersix.png");
+            criticalship[6] = new Texture("smvehicleexplode.png");
+
+            distortship = new Texture[7];
+            distortship[0] = new Texture("smdistone.png");
+            distortship[1] = new Texture("smdisttwo.png");
+            distortship[2] = new Texture("smdistthree.png");
+            distortship[3] = new Texture("smdistfour.png");
+            distortship[4] = new Texture("smdistfive.png");
+            distortship[5] = new Texture("smdistsix.png");
+            distortship[6] = new Texture("smvehicleexplode.png");
+
             maxOffset = (Gdx.graphics.getHeight()/2 - gapSize/2);
-            spacing = (Gdx.graphics.getWidth()*2/3) + (gapSize);
+            spacing = (Gdx.graphics.getWidth()*2/3) + (gapSize-thrust);
 
         } else {
 
             background = new Texture("bgblue.png");
+            dialogs[0] = new Texture("dialogempty.png");
             gapSize = 450;
             thrust = -25;
             maxOffset = (Gdx.graphics.getHeight()/2 - gapSize);
             spacing = (Gdx.graphics.getWidth()*2/3) + (gapSize/2);
+            fontgreen.getData().scale(1.8f);
+            fontred.getData().scale(1.8f);
+            font.getData().scale(5f);
+            textOffset = 100;
+
+            topBar = new Texture("topbarrier.png");
+            bottomBar = new Texture("bottombarrier.png");
+
+            vehicles = new Texture[7];
+            vehicles[0] = new Texture("vehicle.png");
+            vehicles[1] = new Texture("vehicletwo.png");
+            vehicles[2] = new Texture("vehiclethree.png");
+            vehicles[3] = new Texture("vehiclefour.png");
+            vehicles[4] = new Texture("vehiclefive.png");
+            vehicles[5] = new Texture("vehiclesix.png");
+            vehicles[6] = new Texture("vehicleexplode.png");
+
+            powerups = new Texture[3];
+            powerups[0] = new Texture("powerupbonus.png");
+            powerups[1] = new Texture("powerupdistort.png");
+            powerups[2] = new Texture("powerupslow.png");
+
+            criticalship = new Texture[7];
+            criticalship[0] = new Texture("superone.png");
+            criticalship[1] = new Texture("supertwo.png");
+            criticalship[2] = new Texture("superthree.png");
+            criticalship[3] = new Texture("superfour.png");
+            criticalship[4] = new Texture("superfive.png");
+            criticalship[5] = new Texture("supersix.png");
+            criticalship[6] = new Texture("vehicleexplode.png");
+
+            distortship = new Texture[7];
+            distortship[0] = new Texture("distone.png");
+            distortship[1] = new Texture("disttwo.png");
+            distortship[2] = new Texture("distthree.png");
+            distortship[3] = new Texture("distfour.png");
+            distortship[4] = new Texture("distfive.png");
+            distortship[5] = new Texture("distsix.png");
+            distortship[6] = new Texture("vehicleexplode.png");
 
         }
 
-		background = new Texture("bgblue.png");
         winBG = new Texture("bggreen.png");
-		topBar = new Texture("topbarrier.png");
-		bottomBar = new Texture("bottombarrier.png");
 
-        vehicles = new Texture[7];
-        vehicles[0] = new Texture("vehicle.png");
-        vehicles[1] = new Texture("vehicletwo.png");
-        vehicles[2] = new Texture("vehiclethree.png");
-        vehicles[3] = new Texture("vehiclefour.png");
-        vehicles[4] = new Texture("vehiclefive.png");
-        vehicles[5] = new Texture("vehiclesix.png");
-        vehicles[6] = new Texture("vehicleexplode.png");
-
-        powerups = new Texture[3];
-        powerups[0] = new Texture("powerupbonus.png");
-        powerups[1] = new Texture("powerupdistort.png");
-        powerups[2] = new Texture("powerupslow.png");
-
-        criticalship = new Texture[7];
-        criticalship[0] = new Texture("superone.png");
-        criticalship[1] = new Texture("supertwo.png");
-        criticalship[2] = new Texture("superthree.png");
-        criticalship[3] = new Texture("superfour.png");
-        criticalship[4] = new Texture("superfive.png");
-        criticalship[5] = new Texture("supersix.png");
-        criticalship[6] = new Texture("vehicleexplode.png");
-
-        distortship = new Texture[7];
-        distortship[0] = new Texture("distone.png");
-        distortship[1] = new Texture("disttwo.png");
-        distortship[2] = new Texture("distthree.png");
-        distortship[3] = new Texture("distfour.png");
-        distortship[4] = new Texture("distfive.png");
-        distortship[5] = new Texture("distsix.png");
-        distortship[6] = new Texture("vehicleexplode.png");
-
-        dialogs = new Texture[4];
-        dialogs[0] = new Texture("dialogempty.png");
 
 
         // Game variables....
@@ -446,7 +496,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
                     timerDist--;
 
                     // Display our score.
-                    font.draw(batch, String.valueOf(timerDist), 100, 100);
+                    font.draw(batch, String.valueOf(timerDist), textOffset, textOffset);
 
                     // If our countdown timer reaches 0, turn off spacial distortion.
                     if (timerDist <= 0) {
@@ -496,7 +546,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
             // Draw the screen.
             batch.draw(dialogs[0], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
 
-            fontred.draw(batch, myStrings.get("gamelose"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) + 100, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - 100);
+            fontred.draw(batch, myStrings.get("gamelose"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) + textOffset, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - textOffset);
 
             waitTime--;
             if (waitTime <= 0) {
@@ -595,7 +645,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
             // Draw the screen.
             batch.draw(dialogs[0], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
 
-            fontgreen.draw(batch, myStrings.get("gamewin"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) + 100, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - 100);
+            fontgreen.draw(batch, myStrings.get("gamewin"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) + textOffset, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - textOffset);
 
             waitTime--;
             if (waitTime <= 0) {
@@ -649,7 +699,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
             // Draw the screen.
             batch.draw(dialogs[0], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
 
-            fontgreen.draw(batch, myStrings.get("intro"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) + 100, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - 100);
+            fontgreen.draw(batch, myStrings.get("intro"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) + textOffset, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - textOffset);
 
             if (Gdx.input.justTouched()) {
 
@@ -676,7 +726,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
             // Draw the screen.
             batch.draw(dialogs[0], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
 
-            fontgreen.draw(batch, myStrings.get("specialdef"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) + 100, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - 100);
+            fontgreen.draw(batch, myStrings.get("specialdef"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) + textOffset, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - textOffset);
 
             waitTime--;
             if (waitTime <= 0) {
@@ -697,7 +747,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
         } // gamestate is 5, or Paused.
 
         // Display our score.
-        font.draw(batch, String.valueOf(playerScore), 100, Gdx.graphics.getHeight() - 100);
+        font.draw(batch, String.valueOf(playerScore), textOffset, Gdx.graphics.getHeight() - textOffset);
 
 
 

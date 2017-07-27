@@ -21,8 +21,8 @@ android {
         applicationId "com.alaskalinuxuser.criticalvelocity"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 18
-        versionName "2.8"
+        versionCode 19
+        versionName "2.9"
     }
 }
 
