@@ -26,6 +26,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.util.Locale;
 import java.util.Random;
 
 public class criticalvelocity extends ApplicationAdapter implements ApplicationListener {
@@ -34,22 +35,24 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
     //ShapeRenderer shapeRenderer; // For visualizing collision shapes.
 	Texture background, winBG;
 	Texture[] vehicles, dialogs, powerups, criticalship, distortship;
-	Texture topBar, bottomBar;
+	Texture topBar, bottomBar, llDif, lmDif, mmDif, hhDif;
 	int blinkState, gameState, gapSize, maxOffset, numBarriers, numSpecials, spacing, thrust,
-            playerScore, timerDist, waitTime, textOffset;
+            playerScore, timerDist, waitTime, textOffset, levelOfDifficulty, yll, ylm, ymm,
+            yhh, xDif, countPowerups, sizeTouch;
 	float vehicleY, vehicleX, gravityDown, vehicleSpeed, increaseSpeed, winX;
     float[] bothX, bottomY, topY, specY, specX;
     int[] eachOffset, setSpec;
     long id;
     Boolean criticalVelocity, spacialDistortion, waitBoolean;
     Random randomNumber;
-    Circle shipCircle, frontCircle, rearCircle, powerCircle;
+    Circle shipCircle, frontCircle, rearCircle, powerCircle, llCir, lmCir, mmCir, hhCir, touchCir;
     Rectangle barrierRectangleTop, barrierRectangleBottom;
     BitmapFont font, fontgreen, fontred;
     Sound sound, soundOne;
     Music bgMusic;
     I18NBundle myStrings;
     String testString;
+    static final Locale locale = new Locale("ru");
 
     private Viewport viewport;
     private Camera camera;
@@ -82,6 +85,12 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
         frontCircle = new Circle();
         rearCircle = new Circle();
         powerCircle = new Circle();
+        llCir = new Circle();
+        lmCir = new Circle();
+        mmCir = new Circle();
+        hhCir = new Circle();
+        touchCir = new Circle();
+
         barrierRectangleTop = new Rectangle();
         barrierRectangleBottom = new Rectangle();
 
@@ -100,7 +109,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
 
         if (Gdx.graphics.getHeight() <= 901 || Gdx.graphics.getWidth() <= 481) {
 
-            Gdx.app.log("WJH", String.valueOf(Gdx.graphics.getHeight()));
+            //Gdx.app.log("WJH", String.valueOf(Gdx.graphics.getHeight()));
 
             background = new Texture("bgblsm.png");
 
@@ -163,6 +172,11 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
             distortship[5] = new Texture("smdistsix.png");
             distortship[6] = new Texture("smvehicleexplode.png");
 
+            llDif = new Texture("smeasygamedark.png");
+            lmDif = new Texture("smeasytwogamedark.png");
+            mmDif = new Texture("smmediumgamedark.png");
+            hhDif = new Texture("smhardgamedark.png");
+
             maxOffset = (Gdx.graphics.getHeight()/2 - gapSize/2);
             spacing = (Gdx.graphics.getWidth()*2/3) + (gapSize-thrust);
 
@@ -214,6 +228,11 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
             distortship[5] = new Texture("distsix.png");
             distortship[6] = new Texture("vehicleexplode.png");
 
+            llDif = new Texture("easygamedark.png");
+            lmDif = new Texture("easytwogamedark.png");
+            mmDif = new Texture("mediumgamedark.png");
+            hhDif = new Texture("hardgamedark.png");
+
         }
 
         winBG = new Texture("bggreen.png");
@@ -224,6 +243,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
         increaseSpeed = .125f;
         numBarriers = 4;
         numSpecials = 1;
+        levelOfDifficulty = 1;
 
         // My arrays....
         eachOffset = new int[numBarriers];
@@ -260,6 +280,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
 
         // Set our variables.
         playerScore = 0;
+        countPowerups = 0;
         gravityDown = 0;
         blinkState = 0;
         gameState = 0;
@@ -267,7 +288,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
         winX = 0;
         criticalVelocity = false;
         spacialDistortion = false;
-        waitTime = 60;
+        waitTime = 30;
 
         // Testing only //
         //timerDist = 2500;
@@ -321,9 +342,27 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
 		 * 3 = winning
 		 * 4 = game over with win condition.
 		 * 5 = define special abilities.
+		 * 6 = choose difficulty.
 		 */
 
 		if (gameState == 1) {
+
+            if (levelOfDifficulty == 2) {
+
+                increaseSpeed = .25f;
+
+            } else if (levelOfDifficulty == 3) {
+
+                increaseSpeed = .5f;
+
+            } else if (levelOfDifficulty == 4) {
+
+                increaseSpeed = .75f;
+
+            } else {
+
+                increaseSpeed = .125f;
+            }
 
             // We are now in play.
             // Determin our blink state for our ship.
@@ -358,7 +397,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
                 id = sound.play();
 
                 waitBoolean = true;
-                waitTime = 60;
+                waitTime = 30;
                 gameState = 2;
             } // we fell off the screen.
 
@@ -374,7 +413,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
                     // And increase the speed.
                     vehicleSpeed = vehicleSpeed + increaseSpeed;
 
-                    Gdx.app.log("WJH", String.valueOf(vehicleSpeed));
+                    //Gdx.app.log("WJH", String.valueOf(vehicleSpeed));
 
                     // And determine Critical Velocity!
                     if (vehicleSpeed >= 12) {
@@ -454,6 +493,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
 
                     // Play the coin sound!
                     id = soundOne.play();
+                    countPowerups++;
 
                     if (setSpec[p] == 2) {
 
@@ -518,7 +558,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
 
                         // Then we crashed!
                         waitBoolean = true;
-                        waitTime = 60;
+                        waitTime = 30;
                         gameState = 2;
 
                     } // If we collided.
@@ -603,7 +643,7 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
                 id = sound.play();
 
                 waitBoolean = true;
-                waitTime = 60;
+                waitTime = 30;
                 gameState = 2;
             } // we fell off the screen.
 
@@ -629,7 +669,8 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
             else {
 
                 waitBoolean = true;
-                waitTime = 60;
+                waitTime = 30;
+                playerScore = (playerScore + (countPowerups * 50)) * levelOfDifficulty;
                 gameState = 4;
 
             }
@@ -683,33 +724,6 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
 
         }
 
-        if (gameState == 0) {
-
-            // Determin our blink state for our ship.
-            if (blinkState <= 4) {
-
-                blinkState++;
-
-            } else {
-
-                blinkState = 0;
-
-            }
-
-            // Draw the screen.
-            batch.draw(dialogs[0], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
-
-            fontgreen.draw(batch, myStrings.get("intro"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) + textOffset, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - textOffset);
-
-            if (Gdx.input.justTouched()) {
-
-                waitBoolean = true;
-                gameState = 5;
-
-            }
-
-        } // gamestate is 0, or not started yet.
-
         if (gameState == 5) {
 
             // Determin our blink state for our ship.
@@ -739,12 +753,148 @@ public class criticalvelocity extends ApplicationAdapter implements ApplicationL
 
                 if (Gdx.input.justTouched()) {
 
-                gameState = 1;
+                    waitTime = 30;
+
+                    gameState = 6;
 
                 }
             }
 
         } // gamestate is 5, or Paused.
+
+        if (gameState == 6) {
+
+            // Determin our blink state for our ship.
+            if (blinkState <= 4) {
+
+                blinkState++;
+
+            } else {
+
+                blinkState = 0;
+
+            }
+
+            // Draw the screen.
+            batch.draw(dialogs[0], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
+
+            if (Gdx.graphics.getHeight() <= 901 || Gdx.graphics.getWidth() <= 481) {
+
+                    xDif = Gdx.graphics.getWidth() / 2;
+                    yll = Gdx.graphics.getHeight() / 2 + dialogs[0].getHeight() * 2 / 5;
+                    ylm = Gdx.graphics.getHeight() / 2 + dialogs[0].getHeight() * 1 / 5;
+                    ymm = Gdx.graphics.getHeight() / 2 - dialogs[0].getHeight() * 1 / 5;
+                    yhh = Gdx.graphics.getHeight() / 2 - dialogs[0].getHeight() * 2 / 5;
+
+                    batch.draw(llDif, xDif, yll - llDif.getWidth());
+                    batch.draw(lmDif, xDif, ylm - llDif.getWidth());
+                    batch.draw(mmDif, xDif, ymm);
+                    batch.draw(hhDif, xDif, yhh);
+
+                    llCir.set(xDif, yll - llDif.getWidth(), llDif.getWidth() / 2);
+                    lmCir.set(xDif, ylm - llDif.getWidth(), lmDif.getWidth() / 2);
+                    mmCir.set(xDif, ymm, mmDif.getWidth() / 2);
+                    hhCir.set(xDif, yhh, hhDif.getWidth() / 2);
+
+                    sizeTouch = 10;
+            } else {
+
+                xDif = Gdx.graphics.getWidth() / 2;
+                yll = Gdx.graphics.getHeight() / 2 + dialogs[0].getHeight() * 2 / 5;
+                ylm = Gdx.graphics.getHeight() / 2 + dialogs[0].getHeight() * 1 / 5;
+                ymm = Gdx.graphics.getHeight() / 2 - dialogs[0].getHeight() * 1 / 5;
+                yhh = Gdx.graphics.getHeight() / 2 - dialogs[0].getHeight() * 2 / 5;
+
+                batch.draw(llDif, xDif, yll - llDif.getWidth());
+                batch.draw(lmDif, xDif, ylm - llDif.getWidth());
+                batch.draw(mmDif, xDif, ymm + llDif.getWidth());
+                batch.draw(hhDif, xDif, yhh + llDif.getWidth());
+
+                llCir.set(xDif, yll - llDif.getWidth(), llDif.getWidth() / 2);
+                lmCir.set(xDif, ylm - llDif.getWidth(), lmDif.getWidth() / 2);
+                mmCir.set(xDif, ymm + llDif.getWidth(), mmDif.getWidth() / 2);
+                hhCir.set(xDif, yhh + llDif.getWidth(), hhDif.getWidth() / 2);
+
+                sizeTouch = 30;
+            }
+
+            fontgreen.draw(batch, myStrings.get("difficulty"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) +
+                    textOffset, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - textOffset);
+
+            waitTime--;
+            if (waitTime <= 0) {
+
+                waitBoolean = false;
+
+            }
+
+            if (!waitBoolean) {
+
+                if (Gdx.input.justTouched()) {
+
+                    touchCir.set(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), sizeTouch);
+                    // testing only // batch.draw(llDif,touchCir.x,touchCir.y);
+
+                    //Gdx.app.log("WJH touchpoint", String.valueOf(touchCir)); // Write down for logging/testing.
+
+                    // Did we have an overlap of the "myTouch" and a circle?
+                    if (Intersector.overlaps(touchCir, llCir)) {
+
+                        levelOfDifficulty = 1;
+                        gameState = 1;
+
+                    } else if (Intersector.overlaps(touchCir, lmCir)) {
+
+                        levelOfDifficulty = 2;
+                        gameState = 1;
+
+                    } if (Intersector.overlaps(touchCir, mmCir)) {
+
+                        levelOfDifficulty = 3;
+                        gameState = 1;
+
+                    } if (Intersector.overlaps(touchCir, hhCir)) {
+
+                        levelOfDifficulty = 4;
+                        gameState = 1;
+
+                    } // End overlap
+
+                } else {
+
+                    touchCir.set(0, 0, 0); // If not touched, let's move it out of the way.
+
+                } // End input detection.
+            }
+
+        } // gamestate is 6, or choose difficulty.
+
+        if (gameState == 0) {
+
+            // Determin our blink state for our ship.
+            if (blinkState <= 4) {
+
+                blinkState++;
+
+            } else {
+
+                blinkState = 0;
+
+            }
+
+            // Draw the screen.
+            batch.draw(dialogs[0], Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2), Gdx.graphics.getHeight()/2 - (dialogs[0].getHeight()/2));
+
+            fontgreen.draw(batch, myStrings.get("intro"), Gdx.graphics.getWidth()/2 - (dialogs[0].getWidth()/2) + textOffset, Gdx.graphics.getHeight()/2 + (dialogs[0].getHeight()/2) - textOffset);
+
+            if (Gdx.input.justTouched()) {
+
+                waitBoolean = true;
+                gameState = 5;
+
+            }
+
+        } // gamestate is 0, or not started yet.
 
         // Display our score.
         font.draw(batch, String.valueOf(playerScore), textOffset, Gdx.graphics.getHeight() - textOffset);
